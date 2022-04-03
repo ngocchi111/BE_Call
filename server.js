@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on('decline', ({to})=>{
-    io.to(to).emit('decline');
+    io.to(to).emit('callFail');
   })
 
 
@@ -52,11 +52,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("iCallUser", ({ userToCall, signalData, from, name }) => {
-    console.log('icalluser '+ userToCall + ' ' + from)
     io.to(userToCall).emit("iCallUser", {
       signal: signalData,
     });
   });
+
+  socket.on("updateVideo", ({from, to, vid, mic})=>{
+    io.to(to).emit('updateVideo', {from, vid, mic});
+  })
+
+  socket.on('callFail', ({from})=>{
+    io.to(from).emit('callFail');
+  })
+
+  socket.on('leaveCall', ({from, to})=>{
+    io.to(to).emit('endCall');
+    io.to(from).emit('endCall');
+  })
 
   socket.on("updateMyMedia", ({ type, currentMediaStatus }) => {
     console.log("updateMyMedia");
